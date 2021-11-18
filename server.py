@@ -52,6 +52,7 @@ def format_response_lookup(data):
         message += "404 " + "Not Found"
         return message
 
+
 def add_peer(data):
     global peer_list
     lines = data.split("\n")
@@ -60,7 +61,8 @@ def add_peer(data):
     peer_host = re.sub(r"HOST: ", "", lines[1])
     peer_upload = re.sub(r"PORT: ", "", lines[2])
     peer_list[peer_host] = peer_upload
-
+    return peer_host, peer_upload
+    print(peer_list)
 
 def add_rfc(data):
     global rfc_list
@@ -74,36 +76,60 @@ def add_rfc(data):
         rfc_list[rfc_number].append({"PEER HOST": peer_host, "RFC TITLE": rfc_title})
     else:
         rfc_list[rfc_number] = [{"PEER HOST": peer_host, "RFC TITLE": rfc_title}]
+    print(rfc_list)
+
+def clean_peer_and_rfc(peer_host, peer_upload):
+    global peer_list
+    global rfc_list
+    del (peer_list[peer_host])
+    for key, value in rfc_list.items():
+        rfc_list[key] = [x for x in value if x.get("PEER HOST") != peer_host]
+    rfc_list = {k: v for k, v in rfc_list.items() if v}
+    print(peer_list)
+    print(rfc_list)
 
 
 def client_thread(clientSocket, clientAddress, lock):
     global peer_list
     global rfc_list
+    peer_host = ""
+    peer_upload = 0
     while True:
         raw_data = clientSocket.recv(1024)
         data = raw_data.decode()
         first_line = data.split("\n")[0]
-        if re.search(r"ADD", first_line):
-            lock.acquire()
-            add_peer(data)
-            add_rfc(data)
-            print(peer_list)
-            print(rfc_list)
-            lock.release()
-            response = format_response_add(("200", "OK"), data)
-            clientSocket.send(response.encode())
-        elif re.search(r"LIST", first_line):
-            lock.acquire()
-            print(peer_list)
-            print(rfc_list)
-            response = format_response_list(("200", "OK"))
-            lock.release()
-            clientSocket.send(response.encode())
-        elif re.search(r"LOOKUP", first_line):
-            lock.acquire()
-            response = format_response_lookup(data)
-            lock.release()
-            clientSocket.send(response.encode())
+        if re.search(r"P2P\-CI\/1\.0", first_line):
+            if re.search(r"ADD", first_line):
+                lock.acquire()
+                peer_host, peer_upload = add_peer(data)
+                add_rfc(data)
+                lock.release()
+                response = format_response_add(("200", "OK"), data)
+                clientSocket.send(response.encode())
+            elif re.search(r"LIST", first_line):
+                lock.acquire()
+                response = format_response_list(("200", "OK"))
+                lock.release()
+                clientSocket.send(response.encode())
+            elif re.search(r"LOOKUP", first_line):
+                lock.acquire()
+                response = format_response_lookup(data)
+                lock.release()
+                clientSocket.send(response.encode())
+            else:
+                message = "P2P-CI/1.0 400 BAD REQUEST \n"
+                clientSocket.send(message.encode())
+        elif len(raw_data) == 0:
+            # This means the socket is closed and we need to clean up
+            if peer_host:
+                lock.acquire()
+                clean_peer_and_rfc(peer_host, peer_upload)
+                lock.release
+            break
+        else:
+            message = "P2P-CI/1.0 505 P2P-CI VERSION NOT SUPPORTED \n"
+            clientSocket.send(message.encode())
+    print("This thread is done")
 
 
 def main():

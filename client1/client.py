@@ -157,6 +157,10 @@ def server_process(clientServerSocket, upload_port):
             data = get_file(peer_host, peer_port, get_message)
             write_local_rfc(rfc_number, data)
 
+        elif request_type == "CLOSE":
+            clientServerSocket.close()
+            break
+
 
 def main():
     # Manually create a random port number for the upload socket connection
