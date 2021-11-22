@@ -132,7 +132,7 @@ def handler_upload_process(peerSocket, peerAddress):
 
 
 def upload_process(clientUploadSocket, upload_port):
-    clientName = socket.gethostname()
+    clientName = "0.0.0.0"
     clientUploadSocket.bind((clientName, upload_port))
     clientUploadSocket.listen()
     while True:
@@ -143,7 +143,7 @@ def upload_process(clientUploadSocket, upload_port):
 
 def server_process(clientServerSocket, upload_port):
     serverPort = 7734
-    serverName = "manojs-mbp.lan"
+    serverName = "0.0.0.0"
     clientName = socket.gethostname()
     clientServerSocket.connect((serverName, serverPort))
     clientPort = clientServerSocket.getsockname()[1]

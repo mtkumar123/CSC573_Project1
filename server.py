@@ -64,6 +64,7 @@ def add_peer(data):
     return peer_host, peer_upload
     print(peer_list)
 
+
 def add_rfc(data):
     global rfc_list
     lines = data.split("\n")
@@ -77,6 +78,7 @@ def add_rfc(data):
     else:
         rfc_list[rfc_number] = [{"PEER HOST": peer_host, "RFC TITLE": rfc_title}]
     print(rfc_list)
+
 
 def clean_peer_and_rfc(peer_host, peer_upload):
     global peer_list
@@ -128,7 +130,7 @@ def client_thread(clientSocket, clientAddress, lock):
             if peer_host:
                 lock.acquire()
                 clean_peer_and_rfc(peer_host, peer_upload)
-                lock.release
+                lock.release()
             break
         else:
             message = "P2P-CI/1.0 505 P2P-CI VERSION NOT SUPPORTED \n"
@@ -140,7 +142,7 @@ def client_thread(clientSocket, clientAddress, lock):
 def main():
     # Entry point for server.py
     serverPort = 7734
-    serverName = "manojs-mbp.lan"
+    serverName = "0.0.0.0"
     serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     serverSocket.bind((serverName, serverPort))
     serverSocket.listen()
