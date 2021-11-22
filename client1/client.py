@@ -47,7 +47,7 @@ def format_send_message_peer(rfc_number):
         message += "OS: " + platform.system() + " " + platform.release() + "\n"
         message += "LAST-MODIFIED: " + str(
             os.path.getmtime("./{}.txt".format(str(rfc_number)))) + datetime.datetime.fromtimestamp(
-            os.path.getmtime("./7231.txt")).astimezone().tzname() + "\n"
+            os.path.getmtime("./{}.txt".format(str(rfc_number)))).astimezone().tzname() + "\n"
         message += "CONTENT-LENGTH: " + str(len(file_data.encode())) + "\n"
         message += "CONTENT-TYPE: text/text\n"
         message += file_data

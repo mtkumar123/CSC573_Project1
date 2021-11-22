@@ -101,6 +101,7 @@ def client_thread(clientSocket, clientAddress, lock):
         if re.search(r"P2P\-CI\/1\.0", first_line):
             if re.search(r"ADD", first_line):
                 lock.acquire()
+                print(data)
                 peer_host, peer_upload = add_peer(data)
                 add_rfc(data)
                 lock.release()
@@ -108,16 +109,19 @@ def client_thread(clientSocket, clientAddress, lock):
                 clientSocket.send(response.encode())
             elif re.search(r"LIST", first_line):
                 lock.acquire()
+                print(data)
                 response = format_response_list(("200", "OK"))
                 lock.release()
                 clientSocket.send(response.encode())
             elif re.search(r"LOOKUP", first_line):
                 lock.acquire()
+                print(data)
                 response = format_response_lookup(data)
                 lock.release()
                 clientSocket.send(response.encode())
             else:
                 message = "P2P-CI/1.0 400 BAD REQUEST \n"
+                print(data)
                 clientSocket.send(message.encode())
         elif len(raw_data) == 0:
             # This means the socket is closed and we need to clean up
@@ -128,6 +132,7 @@ def client_thread(clientSocket, clientAddress, lock):
             break
         else:
             message = "P2P-CI/1.0 505 P2P-CI VERSION NOT SUPPORTED \n"
+            print(data)
             clientSocket.send(message.encode())
     print("This thread is done")
 
