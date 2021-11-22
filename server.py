@@ -135,7 +135,7 @@ def client_thread(clientSocket, clientAddress, lock):
 def main():
     # Entry point for server.py
     serverPort = 7734
-    serverName = "127.0.0.1"
+    serverName = "manojs-mbp.lan"
     serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     serverSocket.bind((serverName, serverPort))
     serverSocket.listen()
