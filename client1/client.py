@@ -77,8 +77,11 @@ def get_file(peer_host, peer_port, get_message):
         # Obtain the data already received
         data = response[header_length:]
         # Recieve the rest of the data
-        remaining_data = clientDownloadSocket.recv(data_length - header_length)
-        data += remaining_data.decode()
+        remaining_data_length = data_length - (len(raw_response) - header_length)
+        while remaining_data_length > 0:
+            remaining_data = clientDownloadSocket.recv(remaining_data_length)
+            data += remaining_data.decode()
+            remaining_data_length -= len(remaining_data)
         clientDownloadSocket.close()
         return data
     else:
@@ -143,7 +146,7 @@ def upload_process(clientUploadSocket, upload_port):
 
 def server_process(clientServerSocket, upload_port):
     serverPort = 7734
-    serverName = "0.0.0.0"
+    serverName = "Manojs-MacBook-Pro.local"
     clientName = socket.gethostname()
     clientServerSocket.connect((serverName, serverPort))
     clientPort = clientServerSocket.getsockname()[1]
