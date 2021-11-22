@@ -143,7 +143,7 @@ def upload_process(clientUploadSocket, upload_port):
 
 def server_process(clientServerSocket, upload_port):
     serverPort = 7734
-    serverName = "0.0.0.0"
+    serverName = "192.168.1.220"
     clientName = socket.gethostname()
     clientServerSocket.connect((serverName, serverPort))
     clientPort = clientServerSocket.getsockname()[1]
@@ -199,7 +199,6 @@ def server_process(clientServerSocket, upload_port):
                     clientServerSocket.send(add_message.encode())
                     raw_response = clientServerSocket.recv(1024)
                     response = raw_response.decode()
-                    print(response)
             else:
                 print("There was an error, here is your error message")
                 print(response)
